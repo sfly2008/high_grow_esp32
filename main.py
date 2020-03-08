@@ -2,6 +2,7 @@ from libs.light_data import LightData
 from libs.dht12 import DhtData
 from libs.salt_data import SaltData
 from libs.soil_data import SoilData
+from libs.vbat_data import VBatData
 from machine import Pin
 
 
@@ -13,6 +14,7 @@ class SensorsData:
         self.DHT = DhtData()
         self.SALT = SaltData()
         self.SOIL = SoilData()
+        self.VBAT = VBatData()
 
     def all_data(self):
         self.turn_power(on=True)
@@ -48,6 +50,10 @@ class SensorsData:
     def salt(self):
         self.turn_power()
         return self.SALT.salt_data()
+
+    def vbat(self):
+        self.turn_power()
+        return self.VBAT.read_bat()
 
 
 sensors = SensorsData()
