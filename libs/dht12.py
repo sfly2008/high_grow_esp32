@@ -1,17 +1,14 @@
 from machine import Pin
 from utime import sleep_ms
 from dht import DHT11
-from libs.data_cfg import CfgData
 
 
 class DhtData:
 
-    def __init__(self):
-        self.Cfg = CfgData()
-        self.PWR = Pin(self.Cfg.PWR_PIN, Pin.OUT, value=1)
-        self.PIN = Pin(self.Cfg.DHT_PIN)
-        self.WAIT = 2000
-        self.SENSOR = DHT11(self.PIN)
+    def __init__(self, dht_pin=16, wait_time_ms=2000):
+        self.PIN = dht_pin
+        self.WAIT = wait_time_ms
+        self.SENSOR = DHT11(Pin(self.PIN))
 
     def temp_data(self):
         self.SENSOR.measure()
@@ -22,3 +19,6 @@ class DhtData:
         self.SENSOR.measure()
         sleep_ms(self.WAIT)
         return self.SENSOR.humidity()
+
+    def read_all(self):
+        return "Temp: {}; Hmdt: {}".format(self.temp_data(), self.hmdt_data())

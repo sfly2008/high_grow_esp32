@@ -1,22 +1,18 @@
 from machine import Pin, ADC
 from utime import sleep_ms
-from libs.data_cfg import CfgData
 
 
 class SoilData:
 
-    def __init__(self):
-        self.Cfg = CfgData()
-        self.PIN = Pin(self.Cfg.SOIL_PIN)
-        self._ADC = ADC(self.PIN)
-        self.SAMPLES = self.Cfg.SOIL_SAMPLES
-        self.PWR = Pin(self.Cfg.PWR_PIN, Pin.OUT, value=0)
+    def __init__(self, soil_pin=32):
+        self.PIN = soil_pin
+        self.SOIL_ADC = ADC(Pin(self.PIN))
+        self.SOIL_ADC.atten(ADC.ATTN_11DB)
+        self.SOIL_ADC.width(ADC.WIDTH_12BIT)
 
-    def soil_data(self):
+    def soil_data(self, samples=13):
         data_cum = 0
-        self.PWR.value(1)
-        for _ in range(self.SAMPLES):
-            data_cum += self._ADC.read()
+        for i in range(samples):
+            data_cum += self.SOIL_ADC.read()
             sleep_ms(2000)
-        self.PWR.value(0)
-        return data_cum/self.SAMPLES
+        return data_cum/samples
