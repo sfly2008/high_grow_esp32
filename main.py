@@ -5,11 +5,13 @@ from libs.soil_data import SoilData
 from libs.vbat_data import VBatData
 from machine import Pin
 
+pwr_pin = Pin(4, Pin.OUT)
+pwr_pin.value(1)
+
 
 class SensorsData:
 
-    def __init__(self, power_pin=4):
-        self.PWR = Pin(power_pin, Pin.OUT)
+    def __init__(self):
         self.LIGHT = LightData()
         self.DHT = DhtData()
         self.SALT = SaltData()
@@ -17,42 +19,32 @@ class SensorsData:
         self.VBAT = VBatData()
 
     def all_data(self):
-        self.turn_power(on=True)
-        return ("Light: {} lx\nTemp: {} C\nHumidity: {}\nSoil: {}\nSalt: {}"
-                .format(self.light(), self.temp(), self.hmdt(), self.soil(),
-                        self.salt()))
-
-    def turn_power(self, on=True):
-        if on:
-            self.PWR.value(1)
-        elif not on:
-            self.PWR.value(0)
-        else:
-            raise ValueError("Only 'True' or 'False' values allowed as "
-                             "input parameter")
+        data = {
+            "Light": self.light,
+            "Temp": self.temp,
+            "Hmdt": self.hmdt,
+            "Soil": self.soil,
+            "Salt": self.salt,
+            "Bat": self.vbat
+        }
+        return data
 
     def temp(self):
-        self.turn_power()
         return self.DHT.temp_data()
 
     def hmdt(self):
-        self.turn_power()
         return self.DHT.hmdt_data()
 
     def light(self):
-        self.turn_power()
         return self.LIGHT.light_data()
 
-    def soil(self):
-        self.turn_power()
-        self.SOIL.soil_data()
+    def soil(self, samples=10):
+        self.SOIL.soil_data(samples=samples)
 
     def salt(self):
-        self.turn_power()
         return self.SALT.salt_data()
 
     def vbat(self):
-        self.turn_power()
         return self.VBAT.read_bat()
 
 
