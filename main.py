@@ -18,8 +18,8 @@ class SensorsData:
         self.SOIL = SoilData()
         self.VBAT = VBatData()
 
-    def all_data(self):
-        data = {
+    def all_data(self, data_key='Temp'):
+        data_dict = {
             "Light": self.light,
             "Temp": self.temp,
             "Hmdt": self.hmdt,
@@ -27,7 +27,10 @@ class SensorsData:
             "Salt": self.salt,
             "Bat": self.vbat
         }
-        return data
+        if data_key in data_dict.keys():
+            return data_dict[data_key]()
+        else:
+            raise ValueError('Supplied key {} is invalid'.format(data_key))
 
     def temp(self):
         return self.DHT.temp_data()
@@ -39,7 +42,7 @@ class SensorsData:
         return self.LIGHT.light_data()
 
     def soil(self, samples=10):
-        self.SOIL.soil_data(samples=samples)
+        return self.SOIL.soil_data(samples=samples)
 
     def salt(self):
         return self.SALT.salt_data()
