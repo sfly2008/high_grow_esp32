@@ -19,13 +19,19 @@ class SensorsData:
         self.VBAT = VBatData()
 
     def all_data(self):
+        lt = self.LIGHT.light_data()
+        tmp = self.DHT.temp_data()
+        hmd = self.DHT.hmdt_data()
+        sll = self.SOIL.soil_data()
+        slt = self.SALT.salt_data()
+        bat = self.VBAT.read_bat()
         data_dict = {
-            "Light": self.light,
-            "Temp": self.temp,
-            "Hmdt": self.hmdt,
-            "Soil": self.soil,
-            "Salt": self.salt,
-            "Bat": self.vbat
+            "Light": lt,
+            "Temp": tmp,
+            "Hmdt": hmd,
+            "Soil": sll,
+            "Salt": slt,
+            "Bat": bat
         }
         return data_dict
 
@@ -61,7 +67,8 @@ class RstServer:
             "hmdt": self.SDATA.hmdt,
             "soil": self.SDATA.soil,
             "salt": self.SDATA.salt,
-            "vbat": self.SDATA.vbat
+            "vbat": self.SDATA.vbat,
+            "all_data": self.SDATA.all_data
         }
 
     def start_server(self):
@@ -79,16 +86,10 @@ class RstServer:
                 print("Final block")
                 socket.close()
 
-    def get_header(self):
-        return b"""HTTP/1.0 200 OK
-        Content-Type: text/html; charset=utf-8
-        Access-Control-Allow-Origin: *
-        \r\n
-        
-        """
-
     def snd_resp(self, socket, data):
-        socket.send(self.get_header())
+        socket.send(b"""HTTP/1.0 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: '*'\r\n\r\n
+        
+        """)
         socket.send(b"""{}""".format(data))
 
     def snd_err(self, socket, err_code, err_msg):
